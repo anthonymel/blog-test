@@ -44,6 +44,11 @@ return [
             'rules' => [
             ],
         ],
+        'request' => [
+            'parsers' => [
+                'application/json' => 'yii\web\JsonParser',
+            ]
+        ]
         
     ],
     'params' => $params,

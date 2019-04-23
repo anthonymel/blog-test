@@ -1,20 +1,20 @@
 <?php
 
-namespace frontend\models;
-
+namespace common\models;
+use yii\behaviors\TimestampBehavior;
 use Yii;
 
 /**
  * This is the model class for table "post".
  *
  * @property int $id
- * @property int $author_id
  * @property int $date
  * @property int $category_id
  * @property string $text
  * @property string $title
  * @property string $abridgment
  * @property int $activity
+ * @property int $author_id
  */
 class Post extends \yii\db\ActiveRecord
 {
@@ -32,11 +32,14 @@ class Post extends \yii\db\ActiveRecord
     public function rules()
     {
         return [
-            [['author_id', 'date', 'category_id', 'text', 'title', 'abridgment'], 'required'],
-            [['author_id', 'date', 'category_id', 'activity'], 'integer'],
-            [['text', 'abridgment'], 'string'],
+            [['title'], 'required'],
+            [['title','text'], 'string'],
+            [['date'], 'default', 'value' => Yii::$app->formatter->asTimestamp(date('d.m.Y H:i'))],
+            [['category_id'], 'default', 'value' => 1],
+            [['author_id'], 'default', 'value' => Yii::$app->user->id],
+            [['abridgment'], 'default', 'value' => 1],
             [['title'], 'string', 'max' => 255],
-            [['title'], 'unique'],
+            [['category_id'], 'number']
         ];
     }
 
@@ -47,13 +50,13 @@ class Post extends \yii\db\ActiveRecord
     {
         return [
             'id' => 'ID',
-            'author_id' => 'Author ID',
             'date' => 'Date',
             'category_id' => 'Category ID',
             'text' => 'Text',
             'title' => 'Title',
             'abridgment' => 'Abridgment',
             'activity' => 'Activity',
+            'author_id' => 'Author ID',
         ];
     }
 }

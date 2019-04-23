@@ -30,13 +30,13 @@ AppAsset::register($this);
     <?php
     NavBar::begin([
         'brandLabel' => Yii::$app->name,
-        'brandUrl' => Yii::$app->homeUrl,
+        'brandUrl' => ['post/list'],
         'options' => [
             'class' => 'navbar-inverse navbar-fixed-top',
         ],
     ]);
     $menuItems = [
-        ['label' => 'Home', 'url' => ['/site/index']],
+        ['label' => 'Home', 'url' => ['post/list']],
 		['label' => 'About', 'url' => ['/site/about']],
         ['label' => 'Contact', 'url' => ['/site/contact']],
     ];
@@ -44,8 +44,8 @@ AppAsset::register($this);
         $menuItems[] = ['label' => 'Signup', 'url' => ['/site/signup']];
         $menuItems[] = ['label' => 'Login', 'url' => ['/site/login']];
     } else {
-		$menuItems[] = ['label' => 'New Post', 'url' => ['/site/newpost']];
-		$menuItems[] = ['label' => 'My Posts', 'url' => ['/site/myposts']];
+		$menuItems[] = ['label' => 'New Post', 'url' => ['post/create']];
+		$menuItems[] = ['label' => 'My Posts', 'url' => ['post/myposts']];
         $menuItems[] = '<li>'
             . Html::beginForm(['/site/logout'], 'post')
             . Html::submitButton(

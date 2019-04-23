@@ -15,8 +15,8 @@ use frontend\models\ResetPasswordForm;
 use frontend\models\SignupForm;
 use frontend\models\ContactForm;
 use yii\data\Pagination;
-use frontend\models\Post;
-use frontend\models\Users;
+use common\models\Post;
+use common\models\User;
 /**
  * Site controller
  */

@@ -1,33 +1,41 @@
 <?php
 
 namespace frontend\controllers;
-
-use Yii;
-use frontend\models\Post;
-use frontend\models\PostSearch;
+use frontend\models\ResendVerificationEmailForm;
+use frontend\models\VerifyEmailForm;
+use yii\base\InvalidArgumentException;
+use yii\web\BadRequestHttpException;
 use yii\web\Controller;
-use yii\filters\AccessControl;
-use yii\web\NotFoundHttpException;
 use yii\filters\VerbFilter;
+use yii\filters\AccessControl;
+use common\models\LoginForm;
+use frontend\models\PasswordResetRequestForm;
+use frontend\models\ResetPasswordForm;
+use frontend\models\SignupForm;
+use frontend\models\ContactForm;
+use yii\data\Pagination;
+use common\models\Post;
+use common\models\User;
+use yii\widgets\ListView;
+use yii\data\ActiveDataProvider;
 
-/**
- * PostController implements the CRUD actions for Post model.
- */
 class PostController extends Controller
 {
-    /**
-     * {@inheritdoc}
-     */
     public function behaviors()
     {
         return [
-		'access' => [
+            'access' => [
                 'class' => AccessControl::className(),
                 'rules' => [
                     [
                         'actions' => ['login', 'error'],
                         'allow' => true,
-						'roles' => ['@', '?'],
+                        'roles' => ['?'],
+                    ],
+                    [
+                        'actions' => ['logout', 'index', 'create', 'update', 'delete', 'view', 'list', 'myposts'],
+                        'allow' => true,
+                        'roles' => ['@'],
                     ],
                 ],
             ],
@@ -40,45 +48,46 @@ class PostController extends Controller
         ];
     }
 
-    /**
-     * Lists all Post models.
-     * @return mixed
-     */
-    public function actionIndex()
+  	public function actionList()
     {
-        $searchModel = new PostSearch();
-        $dataProvider = $searchModel->search(Yii::$app->request->queryParams);
-
-        return $this->render('index', [
-            'searchModel' => $searchModel,
-            'dataProvider' => $dataProvider,
+        $dataProvider = new ActiveDataProvider([
+            'query' => Post::find()->orderBy('date DESC'),
+            'pagination' => [
+                'pageSize' => 5,
+            ],
         ]);
+        $this->view->title = 'Posts List';
+        return $this->render('_show_item', ['listDataProvider' => $dataProvider]);
     }
 
-    /**
-     * Displays a single Post model.
-     * @param integer $id
-     * @return mixed
-     * @throws NotFoundHttpException if the model cannot be found
-     */
-    public function actionView($id)
+    public function actionShow()
     {
-        return $this->render('view', [
-            'model' => $this->findModel($id),
+    	$id = \Yii::$app->request->get('id');
+        $dataProvider = new ActiveDataProvider([
+            'query' => Post::find()->where(['id' => $id]),
         ]);
+        $this->view->title = 'View post';
+        return $this->render('_show_item', ['listDataProvider' => $dataProvider]);
     }
 
-    /**
-     * Creates a new Post model.
-     * If creation is successful, the browser will be redirected to the 'view' page.
-     * @return mixed
-     */
-    public function actionCreate()
+    public function actionMyposts()
+    {
+    	$dataProvider = new ActiveDataProvider([
+            'query' => Post::find()->where(['author_id' => \Yii::$app->user->identity->id]),
+             'pagination' => [
+                'pageSize' => 5,
+            ],
+        ]);
+        $this->view->title = 'View post';
+        return $this->render('_show_item', ['listDataProvider' => $dataProvider]);
+    }
+
+        public function actionCreate()
     {
         $model = new Post();
 
-        if ($model->load(Yii::$app->request->post()) && $model->save()) {
-            return $this->redirect(['view', 'id' => $model->id]);
+        if ($model->load(\Yii::$app->request->post()) && $model->save()) {
+            return $this->redirect(['show', 'id' => $model->id]);
         }
 
         return $this->render('create', [
@@ -86,53 +95,4 @@ class PostController extends Controller
         ]);
     }
 
-    /**
-     * Updates an existing Post model.
-     * If update is successful, the browser will be redirected to the 'view' page.
-     * @param integer $id
-     * @return mixed
-     * @throws NotFoundHttpException if the model cannot be found
-     */
-    public function actionUpdate($id)
-    {
-        $model = $this->findModel($id);
-
-        if ($model->load(Yii::$app->request->post()) && $model->save()) {
-            return $this->redirect(['view', 'id' => $model->id]);
-        }
-
-        return $this->render('update', [
-            'model' => $model,
-        ]);
-    }
-
-    /**
-     * Deletes an existing Post model.
-     * If deletion is successful, the browser will be redirected to the 'index' page.
-     * @param integer $id
-     * @return mixed
-     * @throws NotFoundHttpException if the model cannot be found
-     */
-    public function actionDelete($id)
-    {
-        $this->findModel($id)->delete();
-
-        return $this->redirect(['index']);
-    }
-
-    /**
-     * Finds the Post model based on its primary key value.
-     * If the model is not found, a 404 HTTP exception will be thrown.
-     * @param integer $id
-     * @return Post the loaded model
-     * @throws NotFoundHttpException if the model cannot be found
-     */
-    protected function findModel($id)
-    {
-        if (($model = Post::findOne($id)) !== null) {
-            return $model;
-        }
-
-        throw new NotFoundHttpException('The requested page does not exist.');
-    }
 }

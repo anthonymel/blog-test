@@ -3,10 +3,10 @@
 namespace backend\controllers;
 
 use Yii;
-use backend\models\User;
-use backend\models\UserSearch;
-use yii\filters\AccessControl;
+use common\models\User;
+use common\models\UserSearch;
 use yii\web\Controller;
+use yii\filters\AccessControl;
 use yii\web\NotFoundHttpException;
 use yii\filters\VerbFilter;
 
@@ -21,16 +21,16 @@ class UserController extends Controller
     public function behaviors()
     {
         return [
-			'access' => [
+            'access' => [
                 'class' => AccessControl::className(),
                 'rules' => [
                     [
                         'actions' => ['login', 'error'],
                         'allow' => true,
-						'roles' => ['?'],
+                        'roles' => ['?'],
                     ],
                     [
-                        'actions' => ['logout', 'index', 'update', 'delete', 'view', 'create'],
+                        'actions' => ['logout', 'index', 'create', 'update', 'delete', 'view'],
                         'allow' => true,
                         'roles' => ['@'],
                     ],
