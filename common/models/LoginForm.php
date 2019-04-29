@@ -43,7 +43,7 @@ class LoginForm extends Model
         if (!$this->hasErrors()) {
             $user = $this->getUser();
             if (!$user || !$user->validatePassword($this->password)) {
-                $this->addError($attribute, User::isUserAdmin($this->username));
+                $this->addError($attribute, 'Error');
             }
         }
     }
@@ -66,10 +66,11 @@ class LoginForm extends Model
     {
         if ($this->validate() && User::isUserAdmin($this->username)) {
             return Yii::$app->user->login($this->getUser(), $this->rememberMe ? 3600 * 24 * 30 : 0);
-        }
+        } else {
             return false;
-        
+        }
     }
+    
     /**
      * Finds user by [[username]]
      *
