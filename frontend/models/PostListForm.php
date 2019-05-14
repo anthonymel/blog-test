@@ -17,51 +17,61 @@ class PostListForm extends Model
     public $limit;
     public $offset;
     public $token;
+    public $result;
 
     public function rules()
     {
         return [
             [['limit'], 'default', 'value' => 10],
-            [['offset'], 'default', 'value' => 0]
+            [['offset'], 'default', 'value' => 0],
+            ['token', 'string', 'min' => 10]
+            //[['result'], 'default', 'value' => 0]
         ];
     }
 
     public function myPosts()
     {
-        /*$token = \Yii::$app->request->get('access-token');
-        $limit = \Yii::$app->request->get('limit');
-        $offset = \Yii::$app->request->get('offset');*/
-        $tokenInfo = Token::find()->andwhere(['token.token' => $this->token])->one();
-        if (!empty($tokenInfo)){
-            $postQuery = Post::find()
-                ->andwhere(['post.author_id' => $tokenInfo->user_id])
-                ->limit($limit)
-                ->offset($offset);
-            $result = [];
-            foreach ($postQuery->each() as $post) {
-                //$post = new Serializer;
-                $result[] = serialize($post);
-            }
-        } else {
-            $result = "wrong_token";
+        if (!$this->validate()) {
+            return false;
         }
-        echo json_encode($result);
-        exit;
+        $tokenInfo = Token::find()->andwhere(['token.token' => $this->token])->one();
+        if (empty($tokenInfo)) {
+            $this->addError('token', 'Wrong token');
+            return false;
+        }
+        $postQuery = Post::find()
+            ->andwhere(['post.author_id' => $tokenInfo->user_id])
+            ->limit($this->limit)
+            ->offset($this->offset);
+        if (empty($postQuery)) {
+            $this->addError('query', 'Can`t find posts');
+            return false;
+        }
+        //$result = [];
+        foreach ($postQuery->each() as $post) {
+            //$post = new Serializer;
+            $this->result[] = serialize($post);
+        }
+        return true;    
     }
 
     public function list()
     {
-        /*$limit = \Yii::$app->request->get('limit');
-        $offset = \Yii::$app->request->get('offset');*/
+        if (!$this->validate()) {
+            return false;
+        }
         $postQuery = Post::find()
                 ->limit($this->limit)
                 ->offset($this->offset);
-        $result = [];
-        foreach ($postQuery->each() as $post) {
-            $result[] = serialize($post);
+        if (empty($postQuery)) {
+            $this->addError('query', 'Can`t find posts');
+            return false;
         }
-        echo json_encode($result);
-        exit;
+        //$result = [];
+        foreach ($postQuery->each() as $post) {
+            $this->result[] = serialize($post);
+        }
+        return true;
     }
 
 }

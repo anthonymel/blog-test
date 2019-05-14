@@ -16,6 +16,7 @@ class SignupByEmailForm extends Model
     public $username;
     public $email;
     public $password;
+    public $token;
 
     public function rules()
     {
@@ -38,28 +39,32 @@ class SignupByEmailForm extends Model
 
     public function signup()
     {
-/*        $username = \Yii::$app->request->get('username');
-        $email = \Yii::$app->request->get('email');
-        $password = \Yii::$app->request->get('password');*/
+        if (!$this->validate()) {
+            //$this->addError('username', 'Invalid username or password');
+            return false;
+        }
         $user = new User();
         $user->username = $this->username;
         $user->email = $this->email;
         $user->auth_key = \Yii::$app->security->generateRandomString();
         $user->password_hash = \Yii::$app->getSecurity()->generatePasswordHash($this->password);
         $user->status = 10;
-        if ($user->save()){
-            $result = [
-                'info' => "success",
-            ];
+        if (!$user->save()){
+            $this->addError('user', 'Unable to save user');
+            $this->addErrors($user->getErrors());
+            return false;
         }
         $token = \Yii::$app->security->generateRandomString();
         $accessToken = new Token();
         $accessToken->user_id = $user->id;
         $accessToken->token = $token;
         if (!$accessToken->save()){
-            $errorInfo = "cant_save_token_to_db";
+            $this->addError('token', 'Unable to save token');
+            $this->addErrors($accessToken->getErrors());
+            return false;
         }
-        echo json_encode($result);
+        $this->token = $token;
+        return true;
         exit;
     }
 }

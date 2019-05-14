@@ -47,10 +47,15 @@ class AuthApiController extends Controller
 	public function actionAuthByEmail()
 	{
 		$model = new AuthByEmailForm();
-        if ($model->load(Yii::$app->request->post()) && $model->login()) {
-            return $this->goBack();
+		$model->load(Yii::$app->request->post(), '');
+        if ($model->login()) {
+			echo json_encode($model->username);
+			echo json_encode($model->token);
+			exit;
         } else {
-            return $this->render('../site/enter', ['model' => $model]);
+        	echo json_encode($model->getErrors());
+        	//return $this->render('../site/enter', ['model' => $model]);
+        	exit;
         }
 		
 	}
@@ -58,10 +63,15 @@ class AuthApiController extends Controller
 	public function actionSignup()
 	{
 		$model = new SignupByEmailForm();
-        if ($model->load(Yii::$app->request->post()) && $model->signup()) {
-            return $this->goBack();
+		$model->load(Yii::$app->request->post(), '');
+        if ($model->signup()) {
+            echo json_encode($model->username);
+			echo json_encode($model->token);
+			exit;
         } else {
-            return $this->render('../site/signup_', ['model' => $model]);
+        	echo json_encode($model->getErrors());
+           // return $this->render('../site/signup_', ['model' => $model]);
+            exit;
         }
 	}
 }

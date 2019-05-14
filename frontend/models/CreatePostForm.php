@@ -29,9 +29,9 @@ class CreatePostForm extends Model
 
     public function createPost()
     {
-        /*$token = \Yii::$app->request->get('access-token');
-        $text = \Yii::$app->request->get('text');
-        $title = \Yii::$app->request->get('title');*/
+        if (!$this->validate()) {
+            return false;
+        }
         $result = null;
         $tokenInfo = Token::find()->andwhere(['token.token' => $this->token])->one();
         $post = new Post();
@@ -39,13 +39,10 @@ class CreatePostForm extends Model
         $post->title = $this->title;
         $post->author_id = $tokenInfo->user_id;
         $post->date = \Yii::$app->formatter->asTimestamp(date('Y-d-m h:i:s'));
-        $post->save();
-        $result = [
-            'info' => "success",
-        ];
-        echo json_encode($result);
-        exit;
-
+        if (!$post->save());{
+            $this->addError('user', 'Unable to save post');
+        }
+        return true;
     }
    
 }

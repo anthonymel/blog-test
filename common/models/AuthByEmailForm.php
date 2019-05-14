@@ -16,6 +16,15 @@ class AuthByEmailForm extends Model
     public $username;
     public $password;
 
+    /**
+     * @var User user
+     */
+    public $user;
+    /**
+     * @var Token token
+     */
+    public $token;
+
     public function rules()
     {
         return [
@@ -26,37 +35,28 @@ class AuthByEmailForm extends Model
     }
     public function login()
     {
-        $hasErrors = false;
+        if (!$this->validate()) {
+           // $this->addError('username', 'Invalid username or password');
+            return false;
+        }
         $token = null;
-        $errorInfo = null;
         $identity = User::findOne(['username' => $this->username]);
-        if (\Yii::$app->security->validatePassword($this->password, $identity->password_hash)) {
-            $hasErrors = false;
-        } else {
-            $hasErrors = true;
-            $errorInfo = "wrong_pass";
+        if (!\Yii::$app->security->validatePassword($this->password, $identity->password_hash)) {
+            $this->addError('username', 'Invalid username or password');
+            return false;
         }
-        if (!$hasErrors) {
-            $token = \Yii::$app->security->generateRandomString();
-            $accessToken = new Token();
-            $accessToken->user_id = $identity->id;
-            $accessToken->token = $token;
-            if (!$accessToken->save()) {
-                $errorInfo = "cant_save_token_to_db";
-            }
+        $token = \Yii::$app->security->generateRandomString();
+        $accessToken = new Token();
+        $accessToken->user_id = $identity->id;
+        $accessToken->token = $token;
+        if (!$accessToken->save()) {
+            $this->addError('token', 'Unable to save token');
+            $this->addErrors($accessToken->getErrors());
+            return false;
         }
-        $result = [
-            'hasErrors' => $hasErrors,
-            'token' => $token,
-            'username' => $this->username,
-        ];
-        if ($hasErrors){
-             $result = [
-                'errorInfo' => $errorInfo,
-            ];
-        }
-        echo json_encode($result);
-        exit;
+        //$this->user = $user;
+        $this->token = $token;
+        return true;
     }
 
 }

@@ -17,39 +17,42 @@ use yii\rest\Serializer;
 
 class PostApiController extends Controller
 {
+    public $enableCsrfValidation = false;
 	public function actionMyPosts()
 	{
 		$model = new PostListForm();
-
-        if ($model->load(Yii::$app->request->get(), '') && $model->myPosts()) {
-
-            return $this->goBack();
+        $model->load(Yii::$app->request->get(), '');
+        if ($model->myPosts()) {
+            echo json_encode($model->result);
+            exit;            
         } else {
-            return $this->render('../site/postList', ['model' => $model]);
+            echo json_encode($model->getErrors());
+            exit;
         }
 	}
 
 	public function actionList()
 	{
 		$model = new PostListForm();
-
-        if ($model->load(Yii::$app->request->get(), '') && $model->list()) {
-            return $this->goBack();
+        $model->load(Yii::$app->request->get(), '');
+        if ($model->list()) {
+            echo json_encode($model->result);
+            exit;            
         } else {
-            return $this->render('../site/postList', ['model' => $model]);
+            echo json_encode($model->getErrors());
+            exit;
         }
 	}
 
 	public function actionCreatePost()
 	{
 		$model = new CreatePostForm();
-
-        if ($model->load(Yii::$app->request->post()) && $model->createPost()) {
-
-            return $this->goBack();
+        $model->load(Yii::$app->request->get(), '');
+        if ($model->createPost()) {
+            echo json_encode($model->token);            
         } else {
-           return $this->render('../site/postList', ['model' => $model]);
+            echo json_encode($model->getErrors());
+            exit;
         }
-	}
-
+    }
 }
