@@ -15,18 +15,29 @@ use yii\filters\VerbFilter;
 use yii\rest\Serializer;
 
 
-class PostApiController extends Controller
+//TODO: extends from PrivateApiController
+
+//TODO: use https://www.yiiframework.com/doc/api/2.0/yii-base-controller#beforeAction()-detail
+//beforeAction. Extact token from get. If emtpy, extract from post. Validate. Save user \Yii::$app->user->login($identity, 0);
+//
+
+class PostApiController extends PrivateApiController
 {
     public $enableCsrfValidation = false;
+
 	public function actionMyPosts()
 	{
 		$model = new PostListForm();
         $model->load(Yii::$app->request->get(), '');
-        if ($model->myPosts()) {
-            echo json_encode($model->result);
+        if ($model->getMyPostsQuery()) {
+            $result = $model->formatQueryAsArray($model->postQuery);
+            echo json_encode($result);
             exit;            
         } else {
-            echo json_encode($model->getErrors());
+            $result = [
+                'errors' => $model->getErrors(),
+            ];
+            echo json_encode($result);
             exit;
         }
 	}
@@ -35,11 +46,15 @@ class PostApiController extends Controller
 	{
 		$model = new PostListForm();
         $model->load(Yii::$app->request->get(), '');
-        if ($model->list()) {
-            echo json_encode($model->result);
+        if ($model->getAllPostQuery()) {
+            $result = $model->formatQueryAsArray($model->postQuery);
+            echo json_encode($result);
             exit;            
         } else {
-            echo json_encode($model->getErrors());
+            $result = [
+                'errors' => $model->getErrors(),
+            ];
+            echo json_encode($result);
             exit;
         }
 	}
@@ -49,9 +64,15 @@ class PostApiController extends Controller
 		$model = new CreatePostForm();
         $model->load(Yii::$app->request->get(), '');
         if ($model->createPost()) {
-            echo json_encode($model->token);            
+            $result = [
+                'token' => $model->token,
+            ];
+            echo json_encode($result);            
         } else {
-            echo json_encode($model->getErrors());
+            $result = [
+                'errors' => $model->getErrors(),
+            ];
+            echo json_encode($result);
             exit;
         }
     }

@@ -13,5 +13,12 @@ use Yii;
  */
 class Token extends BaseToken
 {
-    
+    public static function generateTokenForUser($user)
+    {
+    	$token = \Yii::$app->security->generateRandomString();
+        $accessToken = new Token();
+        $accessToken->user_id = $user->id;
+        $accessToken->token = $token;
+        return $accessToken;
+    }
 }

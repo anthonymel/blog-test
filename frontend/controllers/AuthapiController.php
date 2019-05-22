@@ -14,10 +14,6 @@ use yii\base\Response;
 use yii\web\NotFoundHttpException;
 use yii\filters\VerbFilter;
 
-//TODO: rename file to AuthApiController
-/**
- * PostController implements the CRUD actions for Post model.
- */
 
 class AuthApiController extends Controller
 {
@@ -49,11 +45,17 @@ class AuthApiController extends Controller
 		$model = new AuthByEmailForm();
 		$model->load(Yii::$app->request->post(), '');
         if ($model->login()) {
-			echo json_encode($model->username);
-			echo json_encode($model->token);
+        	$result = [
+        		'username' => $model->username,
+        		'token' => $model->token,
+        	];
+			echo json_encode($result);
 			exit;
         } else {
-        	echo json_encode($model->getErrors());
+        	$result = [
+                'errors' => $model->getErrors(),
+            ];
+        	echo json_encode($result);
         	//return $this->render('../site/enter', ['model' => $model]);
         	exit;
         }
@@ -65,11 +67,17 @@ class AuthApiController extends Controller
 		$model = new SignupByEmailForm();
 		$model->load(Yii::$app->request->post(), '');
         if ($model->signup()) {
-            echo json_encode($model->username);
-			echo json_encode($model->token);
+            $result = [
+                'username' => $model->username,
+                'token' => $model->token,
+            ];
+            echo json_encode($result);
 			exit;
         } else {
-        	echo json_encode($model->getErrors());
+            $result = [
+                'errors' => $model->getErrors(),
+            ];
+            echo json_encode($result);
            // return $this->render('../site/signup_', ['model' => $model]);
             exit;
         }

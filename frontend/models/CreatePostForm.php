@@ -34,11 +34,15 @@ class CreatePostForm extends Model
         }
         $result = null;
         $tokenInfo = Token::find()->andwhere(['token.token' => $this->token])->one();
+        //TODO: validate $tokenInfo
         $post = new Post();
         $post->text = $this->text;
         $post->title = $this->title;
+
+        $user = \Yii::$app->user->getIdentity();
+
         $post->author_id = $tokenInfo->user_id;
-        $post->date = \Yii::$app->formatter->asTimestamp(date('Y-d-m h:i:s'));
+        $post->date = time();
         if (!$post->save());{
             $this->addError('user', 'Unable to save post');
         }

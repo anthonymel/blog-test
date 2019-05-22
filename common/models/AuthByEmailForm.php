@@ -33,6 +33,7 @@ class AuthByEmailForm extends Model
             ['password', 'string', 'min' => 6],
          ];
     }
+
     public function login()
     {
         if (!$this->validate()) {
@@ -40,22 +41,19 @@ class AuthByEmailForm extends Model
             return false;
         }
         $token = null;
-        $identity = User::findOne(['username' => $this->username]);
-        if (!\Yii::$app->security->validatePassword($this->password, $identity->password_hash)) {
+        $user = User::findOne(['username' => $this->username]);
+        if (!\Yii::$app->security->validatePassword($this->password, $user->password_hash)) {
             $this->addError('username', 'Invalid username or password');
             return false;
         }
-        $token = \Yii::$app->security->generateRandomString();
-        $accessToken = new Token();
-        $accessToken->user_id = $identity->id;
-        $accessToken->token = $token;
+        $accessToken = Token::generateTokenForUser($user);
         if (!$accessToken->save()) {
             $this->addError('token', 'Unable to save token');
             $this->addErrors($accessToken->getErrors());
             return false;
         }
         //$this->user = $user;
-        $this->token = $token;
+        $this->token = $accessToken->token;
         return true;
     }
 

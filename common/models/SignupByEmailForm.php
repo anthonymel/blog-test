@@ -48,23 +48,19 @@ class SignupByEmailForm extends Model
         $user->email = $this->email;
         $user->auth_key = \Yii::$app->security->generateRandomString();
         $user->password_hash = \Yii::$app->getSecurity()->generatePasswordHash($this->password);
-        $user->status = 10;
+        $user->status = User::STATUS_ACTIVE;
         if (!$user->save()){
             $this->addError('user', 'Unable to save user');
             $this->addErrors($user->getErrors());
             return false;
         }
-        $token = \Yii::$app->security->generateRandomString();
-        $accessToken = new Token();
-        $accessToken->user_id = $user->id;
-        $accessToken->token = $token;
+        $accessToken = Token::generateTokenForUser($user);
         if (!$accessToken->save()){
             $this->addError('token', 'Unable to save token');
             $this->addErrors($accessToken->getErrors());
             return false;
         }
-        $this->token = $token;
+        $this->token = $accessToken->token;
         return true;
-        exit;
     }
 }
