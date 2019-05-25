@@ -15,30 +15,29 @@ use yii\web\NotFoundHttpException;
 use yii\filters\VerbFilter;
 
 
+
+//http://apidocjs.com
+//apidoc -f ".*\\.php$" -i frontend -o frontend/web/api-doc
+
+
 class AuthApiController extends Controller
 {
 	public $enableCsrfValidation = false;
-/*	public $username;
-	public $password;
-    public $email;*/
 
-	// /**
- //     * {@inheritDoc}
- //     * @see \yii\rest\Controller::behaviors()
- //     */
- //    public function behaviors()
- //    {
- //        $behaviors = parent::behaviors();
-    
- //        $behaviors['contentNegotiator'] = [
- //            'class' => ContentNegotiator::className(),
- //            'formats' => [
- //                'application/json' => Response::FORMAT_JSON,
- //            ],
- //        ];
-    
- //        return $behaviors;
- //    }
+    /**
+     * @api {post} /frontend/web/auth-api/auth-by-email Авторизация пользователя по username.
+     * @apiDescription Авторизация пользователя по username.
+     * @apiName AuthByEmail
+     * @apiGroup Auth
+     *
+     * @apiParam {String} username Имя пользователя.
+     * @apiParam {String} password пароль пользователя.
+     *
+     * @apiSuccess {String} username Имя пользователя.
+     * @apiSuccess {String} accessToken Токен доступа.
+     *
+     * @apiVersion 0.1.0
+     */
 
 	public function actionAuthByEmail()
 	{
@@ -61,6 +60,22 @@ class AuthApiController extends Controller
         }
 		
 	}
+
+    /**
+     * @api {post} /frontend/web/auth-api/signup Регистрация пользователя.
+     * @apiDescription Регистрация пользователя.
+     * @apiName Signup
+     * @apiGroup Auth
+     *
+     * @apiParam {String} username Имя пользователя.
+     * @apiParam {String} email Email пользователя.
+     * @apiParam {String} password Пароль пользователя.
+     *
+     * @apiSuccess {String} username Имя пользователя.
+     * @apiSuccess {String} accessToken Токен доступа.
+     *
+     * @apiVersion 0.1.0
+     */
 
 	public function actionSignup()
 	{

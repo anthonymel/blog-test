@@ -31,29 +31,25 @@ class PostListForm extends Model
         ];
     }
 
- 
-    public function getMyPostsQuery()
+    public function prepareMyPostsQuery()
     {
         if (!$this->validate()) {
             return false;
         }
-
-        //TODO: $user = \Yii::$app->user->getIdentity();
-        //TODO: remove
-        $tokenInfo = Token::find()->andwhere(['token.token' => $this->token])->one();
-        if (empty($tokenInfo)) {
+        $user = \Yii::$app->user->getIdentity();
+        if (empty($user)) {
             $this->addError('token', 'Wrong token');
             return false;
         }
         $this->postQuery = Post::find()
-            ->andwhere(['post.author_id' => $tokenInfo->user_id])
+            ->andwhere(['post.author_id' => $user->id])
             ->limit($this->limit)
             ->offset($this->offset);
         return true;
     }
 
 
-    public function getAllPostQuery()
+    public function prepareAllPostQuery()
     {
         if (!$this->validate()) {
             return false;
@@ -67,15 +63,13 @@ class PostListForm extends Model
     public function formatQueryAsArray($query)
     {
         $result = [];
-        $number = 0;
         foreach ($query->each() as $post) {
-            $result[$number] = [
+            $result[] = [
                 'id' => $post->id,
                 'text' => $post->text,
                 'title' => $post->title,
                 'date' => $post->date,
             ];
-        $number++;
         }
         return $result;
     }

@@ -25,11 +25,26 @@ class PostApiController extends PrivateApiController
 {
     public $enableCsrfValidation = false;
 
+    /**
+     * @api {get} /frontend/web/post-api/my-posts Вывод записей пользователя.
+     * @apiDescription Вывод записей пользователя.
+     * @apiName MyPosts
+     * @apiGroup Post
+     *
+     * @apiParam {String} token Token пользователя.
+     * @apiParam {String} [limit] Количество возвращаемых записей.
+     * @apiParam {String} [offset] Отступ (сколько записей было загружено ранее).
+     *
+     * @apiSuccess {String[]} result Список публикаций.
+     *
+     * @apiVersion 0.1.0
+     */
+
 	public function actionMyPosts()
 	{
 		$model = new PostListForm();
         $model->load(Yii::$app->request->get(), '');
-        if ($model->getMyPostsQuery()) {
+        if ($model->prepareMyPostsQuery()) {
             $result = $model->formatQueryAsArray($model->postQuery);
             echo json_encode($result);
             exit;            
@@ -42,11 +57,25 @@ class PostApiController extends PrivateApiController
         }
 	}
 
+    /**
+     * @api {get} /frontend/web/post-api/list Вывод всех записей, имеющихся в системе.
+     * @apiDescription Вывод всех записей.
+     * @apiName List
+     * @apiGroup Post
+     *
+     * @apiParam {String} [limit] Количество возвращаемых записей.
+     * @apiParam {String} [offset] Отступ (сколько записей было загружено ранее).
+     *
+     * @apiSuccess {String[]} result Список публикаций.
+     *
+     * @apiVersion 0.1.0
+     */
+
 	public function actionList()
 	{
 		$model = new PostListForm();
         $model->load(Yii::$app->request->get(), '');
-        if ($model->getAllPostQuery()) {
+        if ($model->prepareAllPostQuery()) {
             $result = $model->formatQueryAsArray($model->postQuery);
             echo json_encode($result);
             exit;            
@@ -58,6 +87,21 @@ class PostApiController extends PrivateApiController
             exit;
         }
 	}
+
+    /**
+     * @api {post} /frontend/web/post-api/create-post Отправка публикации в систему.
+     * @apiDescription Отправка публикации.
+     * @apiName CreatePost
+     * @apiGroup Post
+     *
+     * @apiParam {String} token Token пользователя.
+     * @apiParam {String} text Текст публикации.
+     * @apiParam {String} title Заголовок публикации.
+     *
+     * @apiSuccess {String} result Token пользователя.
+     *
+     * @apiVersion 0.1.0
+     */
 
 	public function actionCreatePost()
 	{

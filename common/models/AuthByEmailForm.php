@@ -37,7 +37,6 @@ class AuthByEmailForm extends Model
     public function login()
     {
         if (!$this->validate()) {
-           // $this->addError('username', 'Invalid username or password');
             return false;
         }
         $token = null;
@@ -52,7 +51,6 @@ class AuthByEmailForm extends Model
             $this->addErrors($accessToken->getErrors());
             return false;
         }
-        //$this->user = $user;
         $this->token = $accessToken->token;
         return true;
     }
