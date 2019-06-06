@@ -18,6 +18,8 @@ use Yii;
  * @property int $updated_at
  * @property string $verification_token
  * @property int $role
+ *
+ * @property Token[] $tokens
  */
 class BaseUser extends \yii\db\ActiveRecord
 {
@@ -63,5 +65,13 @@ class BaseUser extends \yii\db\ActiveRecord
             'verification_token' => 'Verification Token',
             'role' => 'Role',
         ];
+    }
+
+    /**
+     * @return \yii\db\ActiveQuery
+     */
+    public function getTokens()
+    {
+        return $this->hasMany(Token::className(), ['user_id' => 'id']);
     }
 }

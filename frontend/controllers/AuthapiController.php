@@ -16,9 +16,6 @@ use yii\filters\VerbFilter;
 
 
 
-//http://apidocjs.com
-//apidoc -f ".*\\.php$" -i frontend -o frontend/web/api-doc
-
 
 class AuthApiController extends Controller
 {
@@ -30,11 +27,10 @@ class AuthApiController extends Controller
      * @apiName AuthByEmail
      * @apiGroup Auth
      *
-     * @apiParam {String} username Имя пользователя.
-     * @apiParam {String} password пароль пользователя.
      *
-     * @apiSuccess {String} username Имя пользователя.
-     * @apiSuccess {String} accessToken Токен доступа.
+     * @apiUse CreateUser
+     *
+     * @apiError InvalidUsernameOrPassword Невреный логин или пароль.
      *
      * @apiVersion 0.1.0
      */
@@ -55,7 +51,6 @@ class AuthApiController extends Controller
                 'errors' => $model->getErrors(),
             ];
         	echo json_encode($result);
-        	//return $this->render('../site/enter', ['model' => $model]);
         	exit;
         }
 		
@@ -66,13 +61,8 @@ class AuthApiController extends Controller
      * @apiDescription Регистрация пользователя.
      * @apiName Signup
      * @apiGroup Auth
-     *
-     * @apiParam {String} username Имя пользователя.
      * @apiParam {String} email Email пользователя.
-     * @apiParam {String} password Пароль пользователя.
-     *
-     * @apiSuccess {String} username Имя пользователя.
-     * @apiSuccess {String} accessToken Токен доступа.
+     * @apiUse CreateUser
      *
      * @apiVersion 0.1.0
      */
@@ -93,7 +83,6 @@ class AuthApiController extends Controller
                 'errors' => $model->getErrors(),
             ];
             echo json_encode($result);
-           // return $this->render('../site/signup_', ['model' => $model]);
             exit;
         }
 	}

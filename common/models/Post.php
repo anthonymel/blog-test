@@ -19,5 +19,17 @@ use Yii;
  */
 class Post extends BasePost
 {
-   
+    public static function formatQueryAsArray($query)
+    {
+        $result = [];
+        foreach ($query->each() as $post) {
+            $result[] = [
+                'id' => $post->id,
+                'text' => $post->text,
+                'title' => $post->title,
+                'date' => $post->date,
+            ];
+        }
+        return $result;
+    }
 }

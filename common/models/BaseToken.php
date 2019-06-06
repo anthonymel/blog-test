@@ -10,8 +10,10 @@ use Yii;
  * @property int $token_id
  * @property int $user_id
  * @property string $token
+ *
+ * @property User $user
  */
-class BaseToken extends \yii\db\ActiveRecord
+class BaseToken extends \yii\db\ActiveRecord 
 {
     /**
      * {@inheritdoc}
@@ -30,6 +32,7 @@ class BaseToken extends \yii\db\ActiveRecord
             [['user_id', 'token'], 'required'],
             [['user_id'], 'integer'],
             [['token'], 'string', 'max' => 32],
+            [['user_id'], 'exist', 'skipOnError' => true, 'targetClass' => User::className(), 'targetAttribute' => ['user_id' => 'id']],
         ];
     }
 
@@ -43,5 +46,13 @@ class BaseToken extends \yii\db\ActiveRecord
             'user_id' => 'User ID',
             'token' => 'Token',
         ];
+    }
+
+    /**
+     * @return \yii\db\ActiveQuery
+     */
+    public function getUser()
+    {
+        return $this->hasOne(User::className(), ['id' => 'user_id']);
     }
 }

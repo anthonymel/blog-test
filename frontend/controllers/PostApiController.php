@@ -15,11 +15,7 @@ use yii\filters\VerbFilter;
 use yii\rest\Serializer;
 
 
-//TODO: extends from PrivateApiController
 
-//TODO: use https://www.yiiframework.com/doc/api/2.0/yii-base-controller#beforeAction()-detail
-//beforeAction. Extact token from get. If emtpy, extract from post. Validate. Save user \Yii::$app->user->login($identity, 0);
-//
 
 class PostApiController extends PrivateApiController
 {
@@ -31,11 +27,13 @@ class PostApiController extends PrivateApiController
      * @apiName MyPosts
      * @apiGroup Post
      *
-     * @apiParam {String} token Token пользователя.
+     * @apiUse token
      * @apiParam {String} [limit] Количество возвращаемых записей.
      * @apiParam {String} [offset] Отступ (сколько записей было загружено ранее).
      *
-     * @apiSuccess {String[]} result Список публикаций.
+     * @apiUse PostSuccess
+     *
+     * @apiUse WrongToken
      *
      * @apiVersion 0.1.0
      */
@@ -45,7 +43,9 @@ class PostApiController extends PrivateApiController
 		$model = new PostListForm();
         $model->load(Yii::$app->request->get(), '');
         if ($model->prepareMyPostsQuery()) {
-            $result = $model->formatQueryAsArray($model->postQuery);
+            $result = [
+                "posts" => Post::formatQueryAsArray($model->postQuery),
+            ];
             echo json_encode($result);
             exit;            
         } else {
@@ -66,7 +66,7 @@ class PostApiController extends PrivateApiController
      * @apiParam {String} [limit] Количество возвращаемых записей.
      * @apiParam {String} [offset] Отступ (сколько записей было загружено ранее).
      *
-     * @apiSuccess {String[]} result Список публикаций.
+     * @apiUse PostSuccess
      *
      * @apiVersion 0.1.0
      */
@@ -76,7 +76,9 @@ class PostApiController extends PrivateApiController
 		$model = new PostListForm();
         $model->load(Yii::$app->request->get(), '');
         if ($model->prepareAllPostQuery()) {
-            $result = $model->formatQueryAsArray($model->postQuery);
+            $result = [
+                "posts" => Post::formatQueryAsArray($model->postQuery),
+            ];
             echo json_encode($result);
             exit;            
         } else {
@@ -94,11 +96,13 @@ class PostApiController extends PrivateApiController
      * @apiName CreatePost
      * @apiGroup Post
      *
-     * @apiParam {String} token Token пользователя.
+     * @apiUse token
      * @apiParam {String} text Текст публикации.
      * @apiParam {String} title Заголовок публикации.
      *
-     * @apiSuccess {String} result Token пользователя.
+     * @apiUse PostCreateSuccess
+     *
+     * @apiUse WrongToken
      *
      * @apiVersion 0.1.0
      */
@@ -109,9 +113,11 @@ class PostApiController extends PrivateApiController
         $model->load(Yii::$app->request->get(), '');
         if ($model->createPost()) {
             $result = [
-                'token' => $model->token,
+                "text" => $model->text,
+                "title" => $model->title,
             ];
-            echo json_encode($result);            
+            echo json_encode($result);
+            exit;            
         } else {
             $result = [
                 'errors' => $model->getErrors(),

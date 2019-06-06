@@ -59,19 +59,4 @@ class PostListForm extends Model
                 ->offset($this->offset);
         return true;
     }
-
-    public function formatQueryAsArray($query)
-    {
-        $result = [];
-        foreach ($query->each() as $post) {
-            $result[] = [
-                'id' => $post->id,
-                'text' => $post->text,
-                'title' => $post->title,
-                'date' => $post->date,
-            ];
-        }
-        return $result;
-    }
-
 }
