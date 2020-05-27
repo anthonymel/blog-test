@@ -36,13 +36,13 @@ AppAsset::register($this);
         ],
     ]);
     $menuItems = [
-        ['label' => 'Home', 'url' => ['post/list']],
-		['label' => 'About', 'url' => ['/site/about']],
-        ['label' => 'Contact', 'url' => ['/site/contact']],
+        ['label' => 'Домашняя', 'url' => ['post/list']],
+		['label' => 'О нас', 'url' => ['/site/about']],
+        ['label' => 'Контакты', 'url' => ['/site/contact']],
     ];
     if (Yii::$app->user->isGuest) {
-        $menuItems[] = ['label' => 'Signup', 'url' => ['/site/signup']];
-        $menuItems[] = ['label' => 'Login', 'url' => ['/site/login']];
+        $menuItems[] = ['label' => 'Регистрация по картинке', 'url' => ['/site/signup-image']];
+        $menuItems[] = ['label' => 'Войти', 'url' => ['/site/login']];
     } else {
 		$menuItems[] = ['label' => 'New Post', 'url' => ['post/create']];
 		$menuItems[] = ['label' => 'My Posts', 'url' => ['post/myposts']];

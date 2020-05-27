@@ -10,6 +10,7 @@ use yii\web\Controller;
 use yii\filters\VerbFilter;
 use yii\filters\AccessControl;
 use common\models\LoginForm;
+use yii\db\Expression;
 use frontend\models\PasswordResetRequestForm;
 use frontend\models\ResetPasswordForm;
 use frontend\models\SignupForm;
@@ -17,6 +18,7 @@ use frontend\models\ContactForm;
 use yii\data\Pagination;
 use common\models\Post;
 use common\models\User;
+use common\models\Authimage;
 /**
  * Site controller
  */
@@ -100,16 +102,27 @@ public function actionIndex()
             return $this->goHome();
         }
 
+        $images = Authimage::find()    
+            ->orderBy(new Expression('rand()'))
+            ->limit(6);
+
         $model = new LoginForm();
-        if ($model->load(Yii::$app->request->post()) && $model->login()) {
+        if ($model->load(Yii::$app->request->post()) && ($model->authImageUrl = Yii::$app->request->post()['authImageUrl']) && $model->login()) {
             return $this->goBack();
         } else {
             $model->password = '';
 
+
             return $this->render('login', [
                 'model' => $model,
+                'images' => $images
             ]);
         }
+    }
+
+    public function actionLoginImage()
+    {
+
     }
 
     /**
@@ -182,19 +195,37 @@ public function actionIndex()
      *
      * @return mixed
      */
-    public function actionSignup()
+    public function actionSignupImage()
     {
         $model = new SignupForm();
-        if ($model->load(Yii::$app->request->post()) && $model->signup()) {
-            Yii::$app->session->setFlash('success', 'Thank you for registration. Please check your inbox for verification email.');
+
+
+        if ($model->load(Yii::$app->request->post()) && ($model->authImageUrl = Yii::$app->request->post()['authImageUrl']) && $model->signup()) {
+            
+            Yii::$app->session->setFlash('success', 'Спасибо за регистрацию!');
             return $this->goHome();
         }
 
+
+        $images = Authimage::find()    
+            ->orderBy(new Expression('rand()'))
+            ->limit(6);
+
         return $this->render('signup', [
             'model' => $model,
+            'images' => $images
         ]);
     }
 
+    public function actionTimeError()
+    {
+        $model = new SignupForm();
+        Yii::$app->session->setFlash('error', 'Время истекло, вы не успели вовремя!');
+        $images = Authimage::find()    
+            ->orderBy(new Expression('rand()'))
+            ->limit(6);
+        return $this->render('index', []);
+    }
     /**
      * Requests password reset.
      *

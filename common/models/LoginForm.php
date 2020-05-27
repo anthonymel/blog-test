@@ -11,6 +11,8 @@ class LoginForm extends Model
 {
     public $username;
     public $password;
+    public $authImageUrl;
+
     public $rememberMe = true;
 
     private $_user;
@@ -28,6 +30,7 @@ class LoginForm extends Model
             ['rememberMe', 'boolean'],
             // password is validated by validatePassword()
             ['password', 'validatePassword'],
+            ['authImageUrl', 'required'],
         ];
     }
 
@@ -55,7 +58,9 @@ class LoginForm extends Model
      */
     public function login()
     {
-        if ($this->validate()) {
+        $user = $this->getUser();
+
+        if ($this->validate() && $user->authImageUrl == $this->authImageUrl) {
             return Yii::$app->user->login($this->getUser(), $this->rememberMe ? 3600 * 24 * 30 : 0);
         }
         
